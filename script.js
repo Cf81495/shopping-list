@@ -2,6 +2,7 @@ const itemForm = document.getElementById("item-form");
 const itemInput = document.getElementById("item-input");
 const itemList = document.getElementById("item-list");
 const clearBtn = document.getElementById("clear");
+const itemFilter = document.getElementById("filter");
 
 const addItem = (e) => {
   e.preventDefault();
@@ -20,7 +21,12 @@ const addItem = (e) => {
 
   const button = createButton("remove-item btn-link text-red");
   li.appendChild(button);
+
+  // Adds the li to the DOM
   itemList.appendChild(li);
+
+  checkUI();
+
   itemInput.value = "";
   console.log(li);
 };
@@ -53,7 +59,23 @@ function clearItems() {
   }
 }
 
+// Clears the filter button out
+function checkUI() {
+  //makes sure I check for an li each time I add another item
+  const items = itemList.querySelectorAll("li");
+
+  if (items.length === 0) {
+    clearBtn.style.display = "none";
+    itemFilter.style.display = "none";
+  } else {
+    clearBtn.style.display = "block";
+    itemFilter.style.display = "block";
+  }
+}
+
 // Event Listeners
 itemForm.addEventListener("submit", addItem);
 itemList.addEventListener("click", removeItem);
 clearBtn.addEventListener("click", clearItems);
+
+checkUI();
