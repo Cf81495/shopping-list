@@ -47,7 +47,11 @@ function createIcon(classes) {
 
 function removeItem(e) {
   if (e.target.parentElement.classList.contains("remove-item")) {
-    e.target.parentElement.parentElement.remove();
+    if (confirm()) {
+      e.target.parentElement.parentElement.remove();
+
+      checkUI();
+    }
   }
 }
 
@@ -57,6 +61,8 @@ function clearItems() {
   while (itemList.firstChild) {
     itemList.removeChild(itemList.firstChild);
   }
+
+  checkUI();
 }
 
 // Clears the filter button out
