@@ -47,7 +47,7 @@ function createIcon(classes) {
 
 function removeItem(e) {
   if (e.target.parentElement.classList.contains("remove-item")) {
-    if (confirm()) {
+    if (confirm("Are you sure you want to remove item?")) {
       e.target.parentElement.parentElement.remove();
 
       checkUI();
