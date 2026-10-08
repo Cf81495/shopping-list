@@ -151,8 +151,6 @@ function removeItemFromStorage(item) {
   localStorage.setItem("items", JSON.stringify(itemsFromStorage));
 }
 
-// REMOVE THIS COMMENT, JUST PUTTING TO REMIND MYSELF TO CLEAR THE ADDITEMTOSTORAGE FUNCT
-
 //could also use innterHTML to clear items this way if I wanted to
 // itemList.innerHTML = "";
 function clearItems() {
