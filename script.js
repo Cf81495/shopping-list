@@ -3,7 +3,8 @@ const itemInput = document.getElementById("item-input");
 const itemList = document.getElementById("item-list");
 const clearBtn = document.getElementById("clear");
 const itemFilter = document.getElementById("filter");
-
+const formBtn = itemForm.querySelector("button");
+let isEditMode = false;
 // Displays items from the local storage when loading page
 function displayItems() {
   const itemsFromStorage = getItemsFromStorage();
@@ -21,6 +22,22 @@ const onAddItemSubmit = (e) => {
   if (newItem === "") {
     alert("Woah buddy, you forgot to add an item!");
     return;
+  }
+
+  // Check for edit mode
+  if (isEditMode) {
+    const itemToEdit = itemList.querySelector(".edit-mode");
+
+    removeItemFromStorage(itemToEdit.textContent);
+    itemToEdit.classList.remove("edit-mode");
+    itemToEdit.remove();
+    isEditMode = false;
+  } else {
+    //Added this in after isEditMode to make sure updates in edit mode can be set back to what they where
+    if (checkIfItemExists(newItem)) {
+      alert("Item is already in the list");
+      return;
+    }
   }
 
   // Create item DOM element
@@ -85,14 +102,53 @@ function getItemsFromStorage(e) {
   return itemsFromStorage;
 }
 
-function removeItem(e) {
+function onClickItem(e) {
   if (e.target.parentElement.classList.contains("remove-item")) {
-    if (confirm("Are you sure you want to remove item?")) {
-      e.target.parentElement.parentElement.remove();
-
-      checkUI();
-    }
+    removeItem(e.target.parentElement.parentElement);
+  } else {
+    setItemToEdit(e.target);
   }
+}
+
+function checkIfItemExists(item) {
+  const itemsFromStorage = getItemsFromStorage();
+
+  // Was if statement to see if item is included in array but this way returns true or false
+  return itemsFromStorage.includes(item);
+}
+
+function setItemToEdit(item) {
+  isEditMode = true;
+
+  //Reset color then swaps based on which you click and turns on editmode
+  itemList
+    .querySelectorAll("li")
+    .forEach((i) => i.classList.remove("edit-mode"));
+  item.classList.add("edit-mode");
+  formBtn.innerHTML = ' <i class="fa-solid fa-pen"></i> Update Item';
+  formBtn.style.backgroundColor = "green";
+  itemInput.value = item.textContent;
+}
+
+function removeItem(item) {
+  if (confirm("Are you sure you want to delete?")) {
+    // Remove item from DOM
+    item.remove();
+
+    // Remove item from storage
+    removeItemFromStorage(item.textContent);
+    checkUI();
+  }
+}
+
+function removeItemFromStorage(item) {
+  let itemsFromStorage = getItemsFromStorage();
+
+  // Filter out the item getting removed from storage
+  itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
+
+  // Re-set to the localstorage
+  localStorage.setItem("items", JSON.stringify(itemsFromStorage));
 }
 
 // REMOVE THIS COMMENT, JUST PUTTING TO REMIND MYSELF TO CLEAR THE ADDITEMTOSTORAGE FUNCT
@@ -103,6 +159,9 @@ function clearItems() {
   while (itemList.firstChild) {
     itemList.removeChild(itemList.firstChild);
   }
+
+  // Clear from the localStorage
+  localStorage.removeItem("items");
 
   checkUI();
 }
@@ -124,6 +183,7 @@ function filterItems(e) {
 
 // Clears the filter button out
 function checkUI() {
+  itemInput.value = "";
   //makes sure I check for an li each time I add another item
   const items = itemList.querySelectorAll("li");
 
@@ -134,13 +194,17 @@ function checkUI() {
     clearBtn.style.display = "block";
     itemFilter.style.display = "block";
   }
+
+  formBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Item';
+  formBtn.style.backgroundColor = "#333";
+  isEditMode = false;
 }
 
 // Initialize app
 function init() {
   // Event Listeners
   itemForm.addEventListener("submit", onAddItemSubmit);
-  itemList.addEventListener("click", removeItem);
+  itemList.addEventListener("click", onClickItem);
   clearBtn.addEventListener("click", clearItems);
   itemFilter.addEventListener("input", filterItems);
   document.addEventListener("DOMContentLoaded", displayItems);
