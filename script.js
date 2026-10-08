@@ -4,6 +4,14 @@ const itemList = document.getElementById("item-list");
 const clearBtn = document.getElementById("clear");
 const itemFilter = document.getElementById("filter");
 
+// Displays items from the local storage when loading page
+function displayItems() {
+  const itemsFromStorage = getItemsFromStorage();
+  itemsFromStorage.forEach((item) => addItemToDOM(item));
+
+  checkUI();
+}
+
 const onAddItemSubmit = (e) => {
   e.preventDefault();
 
@@ -39,20 +47,6 @@ function addItemToDOM(item) {
 }
 
 //
-function addItemToStorage(item) {
-  let itemsFromStorage;
-
-  if (localStorage.getItem("items") === null) {
-    itemsFromStorage = [];
-  } else {
-    itemsFromStorage = JSON.parse(localStorage.getItem("items"));
-  }
-
-  itemsFromStorage.push(item);
-
-  // Convert from array to JSON string
-  localStorage.setItem("items", JSON.stringify(itemsFromStorage));
-}
 
 function createButton(classes) {
   const button = document.createElement("button");
@@ -68,6 +62,29 @@ function createIcon(classes) {
   return icon;
 }
 
+function addItemToStorage(item) {
+  const itemsFromStorage = getItemsFromStorage();
+
+  // Add new item to array
+  itemsFromStorage.push(item);
+
+  // Convert from array to JSON string and set to local storage
+  localStorage.setItem("items", JSON.stringify(itemsFromStorage));
+}
+
+function getItemsFromStorage(e) {
+  let itemsFromStorage;
+
+  // Creates the array of added items
+  if (localStorage.getItem("items") === null) {
+    itemsFromStorage = [];
+  } else {
+    itemsFromStorage = JSON.parse(localStorage.getItem("items"));
+  }
+
+  return itemsFromStorage;
+}
+
 function removeItem(e) {
   if (e.target.parentElement.classList.contains("remove-item")) {
     if (confirm("Are you sure you want to remove item?")) {
@@ -77,6 +94,8 @@ function removeItem(e) {
     }
   }
 }
+
+// REMOVE THIS COMMENT, JUST PUTTING TO REMIND MYSELF TO CLEAR THE ADDITEMTOSTORAGE FUNCT
 
 //could also use innterHTML to clear items this way if I wanted to
 // itemList.innerHTML = "";
@@ -117,10 +136,16 @@ function checkUI() {
   }
 }
 
-// Event Listeners
-itemForm.addEventListener("submit", onAddItemSubmit);
-itemList.addEventListener("click", removeItem);
-clearBtn.addEventListener("click", clearItems);
-itemFilter.addEventListener("input", filterItems);
+// Initialize app
+function init() {
+  // Event Listeners
+  itemForm.addEventListener("submit", onAddItemSubmit);
+  itemList.addEventListener("click", removeItem);
+  clearBtn.addEventListener("click", clearItems);
+  itemFilter.addEventListener("input", filterItems);
+  document.addEventListener("DOMContentLoaded", displayItems);
 
-checkUI();
+  checkUI();
+}
+
+init();
